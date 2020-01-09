@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: api
+  name: user
+  labels:
+    app: user
+spec:
+  selector:
+    matchLabels:
+      app: user
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/schme: 'http'
+        prometheus.io/port: '80'
+      labels:
+        app: user
+    spec:
+      containers:
+      - name: userprofile
+        imagePullPolicy: Always
+        image: "registryugf9246.azurecr.io/tripinsights/userprofile:1.0"
+        env:
+        - name: PORT
+          value: "80"
+        volumeMounts:
+        - name: secrets
+          mountPath: /secrets
+          readOnly: true
+      volumes:
+      - name: secrets
+        flexVolume:
+          driver: "azure/kv"
+          options:
+            usevmmanagedidentity: "true"             # [OPTIONAL new in version >= v0.0.15] if not provided, will default to "false"
+            keyvaultname: "team9kv"              # [REQUIRED] the name of the KeyVault
+            keyvaultobjectnames: "SQL-SERVER;SQL-USER;SQL-PASSWORD;SQL-DBNAME"         # [REQUIRED] list of KeyVault object names (semi-colon separated)
+            keyvaultobjectaliases: "SQL_SERVER;SQL_USER;SQL_PASSWORD;SQL_DBNAME"      # [OPTIONAL] list of KeyVault object aliases
+            keyvaultobjecttypes: "secret;secret;secret;secret"             # [REQUIRED] list of KeyVault object types: secret, key, cert
+            tenantid: "2319eb5c-74f4-4d16-b289-50003acf58fb"                    # [REQUIRED] the tenant ID of the KeyVault
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: api
+  name: user
+  labels:
+    app: user
+spec:
+  ports:
+  - port: 80
+    name: http
+  selector:
+    app: user
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  namespace: api
+  name: user-ingress
+  labels:
+    app: user
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /api/user
+        backend:
+          serviceName: user
+          servicePort: 80
+      - path: /api/docs/user
+        backend:
+          serviceName: user
+          servicePort: 80

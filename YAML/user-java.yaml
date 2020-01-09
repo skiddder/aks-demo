@@ -1,0 +1,77 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: user-java-deployment
+  namespace: api
+spec:
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/schme: 'http'
+        prometheus.io/port: '80'
+        prometheus.io/path: '/api/metrics'
+      labels:
+        app: user-java
+    spec:
+      terminationGracePeriodSeconds: 20
+      containers:
+      - name: user-java
+        image: registryuGf9246.azurecr.io/tripinsights/user-java:1.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: secrets
+          mountPath: /secrets
+          readOnly: true
+      volumes:
+      - name: secrets
+        flexVolume:
+          driver: "azure/kv"
+          options:
+            usevmmanagedidentity: "true"             # [OPTIONAL new in version >= v0.0.15] if not provided, will default to "false"
+            keyvaultname: "team9kv"              # [REQUIRED] the name of the KeyVault
+            keyvaultobjectnames: "SQL-SERVER;SQL-USER;SQL-PASSWORD;SQL-DBNAME"         # [REQUIRED] list of KeyVault object names (semi-colon separated)
+            keyvaultobjectaliases: "SQL_SERVER;SQL_USER;SQL_PASSWORD;SQL_DBNAME"      # [OPTIONAL] list of KeyVault object aliases
+            keyvaultobjecttypes: "secret;secret;secret;secret"             # [REQUIRED] list of KeyVault object types: secret, key, cert
+            tenantid: "2319eb5c-74f4-4d16-b289-50003acf58fb"                    # [REQUIRED] the tenant ID of the KeyVault
+
+#az keyvault secret set --name --value sqlserverugf9246.database.windows.net --vault-name team9kv
+#az keyvault secret set --name  --value sqladminuGf9246 --vault-name team9kv
+#az keyvault secret set --name  --value 8F4030Vk3 --vault-name team9kv
+#az keyvault secret set --name  --value mydrivingDB --vault-name team9kv
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-java-service
+  namespace: api
+spec:
+  selector:
+    app: user-java
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  namespace: api
+  name: user-java-ingress
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /api/user-java
+        backend:
+          serviceName: user-java-service
+          servicePort: 80
+      - path: /api/docs/user-java
+        backend:
+          serviceName: user-java-service
+          servicePort: 80

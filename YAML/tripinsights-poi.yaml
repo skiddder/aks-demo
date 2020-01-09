@@ -1,0 +1,79 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: tripinsights-poi
+  namespace: api
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/schme: 'http'
+        prometheus.io/port: '80'
+      labels:
+        app: tripinsights-poi
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+      - name: tripinsights-poi
+        image: registryugf9246.azurecr.io/tripinsights/poi:1.0
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 80
+            protocol: TCP
+        volumeMounts:
+        - name: secrets
+          mountPath: /secrets
+          readOnly: true
+      volumes:
+      - name: secrets
+        flexVolume:
+          driver: "azure/kv"
+          options:
+            usevmmanagedidentity: "true"             # [OPTIONAL new in version >= v0.0.15] if not provided, will default to "false"
+            keyvaultname: "team9kv"              # [REQUIRED] the name of the KeyVault
+            keyvaultobjectnames: "SQL-SERVER;SQL-USER;SQL-PASSWORD;SQL-DBNAME"         # [REQUIRED] list of KeyVault object names (semi-colon separated)
+            keyvaultobjectaliases: "SQL_SERVER;SQL_USER;SQL_PASSWORD;SQL_DBNAME"      # [OPTIONAL] list of KeyVault object aliases
+            keyvaultobjecttypes: "secret;secret;secret;secret"             # [REQUIRED] list of KeyVault object types: secret, key, cert
+            tenantid: "2319eb5c-74f4-4d16-b289-50003acf58fb"                    # [REQUIRED] the tenant ID of the KeyVault
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: tripinsights-poi
+  namespace: api
+spec:
+  selector:
+    app: tripinsights-poi
+  type: ClusterIP
+  ports:
+    - name: tripinsights-poi
+      port: 8080
+      targetPort: 80
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  namespace: api
+  name: tripinsights-poi-ingress
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /api/poi
+        backend:
+          serviceName: tripinsights-poi
+          servicePort: 80
+      - path: /api/docs/poi
+        backend:
+          serviceName: tripinsights-poi
+          servicePort: 80
+

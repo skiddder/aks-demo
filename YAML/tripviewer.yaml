@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tripviewer
+  namespace: web
+  labels:
+    app: tripviewer
+spec:
+  selector:
+    matchLabels:
+      app: tripviewer
+  template:
+    metadata:
+      labels:
+        app: tripviewer
+    spec:
+      containers:
+      - name: tripviewer
+        imagePullPolicy: Always
+        image: "registryugf9246.azurecr.io/tripinsights/tripviewer:1.0"
+        env:
+          - name: USER_API_ENDPOINT
+            value: "http://user.api.svc.cluster.local"
+          - name: TRIPS_API_ENDPOINT
+            value: "http://tripapi.api.svc.cluster.local"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tripviewer
+  namespace: web
+  labels:
+    app: tripviewer
+spec:
+  ports:
+  - port: 80
+    name: http
+  selector:
+    app: tripviewer
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  namespace: web
+  name: tripviewer-ingress
+  labels:
+    app: tripviewer
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        backend:
+          serviceName: tripviewer
+          servicePort: 80
+

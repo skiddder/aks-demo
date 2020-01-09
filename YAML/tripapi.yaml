@@ -1,0 +1,71 @@
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: tripapi
+  namespace: api
+spec:
+  selector:
+    matchLabels:
+      app: tripapi
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/scheme: 'http'
+        prometheus.io/port: '80'
+      labels:
+        app: tripapi
+    spec:
+      containers:
+      - image: registryugf9246.azurecr.io/tripinsights/tripapi:1.0
+        name: tripapi
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+          name: tripapi
+        volumeMounts:
+        - name: secrets
+          mountPath: /secrets
+          readOnly: true
+      volumes:
+      - name: secrets
+        flexVolume:
+          driver: "azure/kv"
+          options:
+            usevmmanagedidentity: "true"             # [OPTIONAL new in version >= v0.0.15] if not provided, will default to "false"
+            keyvaultname: "team9kv"              # [REQUIRED] the name of the KeyVault
+            keyvaultobjectnames: "SQL-SERVER;SQL-USER;SQL-PASSWORD;SQL-DBNAME"         # [REQUIRED] list of KeyVault object names (semi-colon separated)
+            keyvaultobjectaliases: "SQL_SERVER;SQL_USER;SQL_PASSWORD;SQL_DBNAME"      # [OPTIONAL] list of KeyVault object aliases
+            keyvaultobjecttypes: "secret;secret;secret;secret"             # [REQUIRED] list of KeyVault object types: secret, key, cert
+            tenantid: "2319eb5c-74f4-4d16-b289-50003acf58fb"                    # [REQUIRED] the tenant ID of the KeyVault
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tripapi
+  namespace: api
+spec:
+  ports:
+  - port: 80
+  selector:
+    app: tripapi
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  namespace: api
+  name: tripapi-ingress
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /api/trips
+        backend:
+          serviceName: tripapi
+          servicePort: 80
+      - path: /api/docs/trips
+        backend:
+          serviceName: tripapi
+          servicePort: 80
+
