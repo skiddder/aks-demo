@@ -14,11 +14,15 @@ The application used for this demo is a heavily modified and recreated version o
 
 | File/folder       | Description                                |
 |-------------------|--------------------------------------------|
+| `compose`         | Service definitions                        |
 | `dockerfiles`     | Dockerfiles for source code                |
+| `grafana`         | Monitoring configuration                   |
 | `src`             | Sample source code for POI, Trips, User (Java), UserProfile (Node.JS), and TripViewer                     |
+| `YAML`            | Kubernetes configuration files             |
 | `.gitignore`      | Define what to ignore at commit time.      |
 | `CODE_OF_CONDUCT.md` | Code of conduct.                        |
 | `LICENSE`         | The license for the sample.                |
+|-------------------|--------------------------------------------|
 
 We start with creating the AKS cluster in Azure. You will need a tenant where you have admin consent privileges as well as an Azure subscription with owner permissions.
 
