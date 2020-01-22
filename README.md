@@ -29,9 +29,6 @@ Please start with creating the AKS cluster in Azure. You will need a tenant wher
 
 ## Getting started
 
-### Create the database
-
-
 ### Deploy the AKS cluster
 
 The logic is separated into two scripts in case you have your AKS subscription associated to another tenant as you have admin consent privileges in (most of the time as a developer this will be the case in an enterprise environment). This allows you to run the app and service principal creation against your test tenant and then in a 2nd step create the AKS cluster in another tenant's context (i.e. the development subuscription of your employer).
@@ -47,6 +44,8 @@ Use the data-load container-image to create the schema and populate the database
 Run the following commands form your local cmd/bash to build and push the container images:
 
 ```docker build --no-cache -t <insert-your-container-registry-name-here>/tripinsights/poi:1.0 -f dockerfiles/Dockerfile_3 ./src/poi```
+
+```docker push <insert-your-container-registry-name-here>/tripinsights/poi:1.0```
 
 ```docker build --no-cache -t <insert-your-container-registry-name-here>/user-java:1.0 -f dockerfiles/Dockerfile_0 ./src/user-java```
 
