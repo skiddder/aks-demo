@@ -41,12 +41,14 @@ The logic is separated into two scripts in case you have your AKS subscription a
 As prerequisite you will need a local docker version installed. 
 In Azure create an Azure SQL DB called 'mydrivingDB'.
 Use the data-load container-image to create the schema and populate the database with data by running it in your AKS cluster (or local docker host):
-kubectl run dataload --image=simonslab.azurecr.io/mydriving/data-load:v1 --env="SQLFQDN={your-sql-db-name}:1433" --env="SQLUSER={your-sql-admin-user}" --env="SQLPASS={yourSQLpassword}" --env="SQLDB=mydrivingDB"
+
+```kubectl run dataload --image=simonslab.azurecr.io/mydriving/data-load:v1 --env="SQLFQDN={your-sql-db-name}:1433" --env="SQLUSER={your-sql-admin-user}" --env="SQLPASS={yourSQLpassword}" --env="SQLDB=mydrivingDB"```
 
 Run the following commands form your local cmd/bash to build and push the container images:
 
 ```docker build --no-cache -t <insert-your-container-registry-name-here>/tripinsights/poi:1.0 -f dockerfiles/Dockerfile_3 ./src/poi```
-```docker build --no-cache -t <insert-your-container-registry-name-here>/user-java:1.0 -f dockerfiles/Dockerfile_0 ./src/poi```
+
+```docker build --no-cache -t <insert-your-container-registry-name-here>/user-java:1.0 -f dockerfiles/Dockerfile_0 ./src/user-java```
 
 
 ## Contributing
