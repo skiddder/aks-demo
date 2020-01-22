@@ -1,12 +1,14 @@
+# for a list of available roles use:
+# kubectl get clusterroles
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
+kind: RoleBinding # RoleBindings are scoped to a specific namespace
 metadata:
   name: api-edit
   namespace: api
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: edit
+  name: edit # allows read/write to most objects in a namespace (does not allow view/modify rolebindings)
 subjects:
 - apiGroup: rbac.authorization.k8s.io
   kind: Group
@@ -20,7 +22,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: view
+  name: view # allows read-only to objects in a namespace
 subjects:
 - apiGroup: rbac.authorization.k8s.io
   kind: Group

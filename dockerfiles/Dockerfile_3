@@ -1,6 +1,8 @@
 # 
 # builder - first stage to build the application
 # 
+# use with ./src/poi
+#
 FROM mcr.microsoft.com/dotnet/core/sdk:2.2 AS build-env
 WORKDIR /app
 
