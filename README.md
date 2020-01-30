@@ -43,12 +43,25 @@ Use the data-load container-image to create the schema and populate the database
 
 Run the following commands form your local cmd/bash to build and push the container images:
 
+```docker build --no-cache -t <insert-your-container-registry-name-here>/user-java:1.0 -f dockerfiles/Dockerfile_0 ./src/user-java```
+
+```docker push <insert-your-container-registry-name-here>/tripinsights/user-java:1.0```
+
+```docker build --no-cache -t <insert-your-container-registry-name-here>/tripinsights/tripviewer:1.0 -f dockerfiles/Dockerfile_1 ./src/tripviewer```
+
+```docker push <insert-your-container-registry-name-here>/tripinsights/tripviewer:1.0```
+
+```docker build --no-cache -t <insert-your-container-registry-name-here>/tripinsights/userprofile:1.0 -f dockerfiles/Dockerfile_2 ./src/userprofile```
+
+```docker push <insert-your-container-registry-name-here>/tripinsights/userprofile:1.0```
+
 ```docker build --no-cache -t <insert-your-container-registry-name-here>/tripinsights/poi:1.0 -f dockerfiles/Dockerfile_3 ./src/poi```
 
 ```docker push <insert-your-container-registry-name-here>/tripinsights/poi:1.0```
 
-```docker build --no-cache -t <insert-your-container-registry-name-here>/user-java:1.0 -f dockerfiles/Dockerfile_0 ./src/user-java```
+```docker build --no-cache -t <insert-your-container-registry-name-here>/tripinsights/tripapi:1.0 -f dockerfiles/Dockerfile_4 ./src/trips```
 
+```docker push <insert-your-container-registry-name-here>/tripinsights/tripapi:1.0```
 
 ## Contributing
 
