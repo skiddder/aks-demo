@@ -31,7 +31,7 @@ Please start with creating the AKS cluster in Azure. You will need a tenant wher
 
 ### Deploy the AKS cluster
 
-The logic is separated into two scripts in case you have your AKS subscription associated to another tenant as you have admin consent privileges in (most of the time as a developer this will be the case in an enterprise environment). This allows you to run the app and service principal creation against your test tenant and then in a 2nd step create the AKS cluster in another tenant's context (i.e. the development subuscription of your employer).
+The logic is separated into two scripts in case you have your AKS subscription associated to another tenant than you have admin consent privileges in (most of the time as a developer this will be the case in an enterprise environment). This allows you to run the app and service principal creation against your test tenant and then in a 2nd step create the AKS cluster in another tenant's context (i.e. the development subscription of your employer).
 
 ### Build the containers from dockerfiles
 
@@ -39,7 +39,7 @@ As prerequisite you will need a local docker version installed.
 In Azure create an Azure SQL DB called 'mydrivingDB'.
 Use the data-load container-image to create the schema and populate the database with data by running it in your AKS cluster (or local docker host):
 
-```kubectl run dataload --image=simonslab.azurecr.io/mydriving/data-load:v1 --env="SQLFQDN={your-sql-db-name}:1433" --env="SQLUSER={your-sql-admin-user}" --env="SQLPASS={yourSQLpassword}" --env="SQLDB=mydrivingDB"```
+```kubectl run dataload --image=<insert-your-container-registry-name-here>/mydriving/data-load:v1 --env="SQLFQDN={your-sql-db-name}:1433" --env="SQLUSER={your-sql-admin-user}" --env="SQLPASS={yourSQLpassword}" --env="SQLDB=mydrivingDB"```
 
 Run the following commands form your local cmd/bash to build and push the container images:
 
