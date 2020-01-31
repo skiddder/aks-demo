@@ -17,7 +17,7 @@ spec:
       containers:
       - name: tripviewer
         imagePullPolicy: Always
-        image: "registryugf9246.azurecr.io/tripinsights/tripviewer:1.0"
+        image: "simonslab.azurecr.io/tripinsights/tripviewer:1.0"
         env:
           - name: USER_API_ENDPOINT
             value: "http://user.api.svc.cluster.local"

@@ -26,6 +26,7 @@ subscriptionId="48006515-4d68-4a94-84a2-69da5d351c6f"
 targetResourceGroup="rg-AKS"
 targetSubnetId="/subscriptions/${subscriptionId}/resourceGroups/rg-AKS/providers/Microsoft.Network/virtualNetworks/aks-vnet/subnets/aks-subnet"
 attachedACR="simonslab"
+workspaceid="/subscriptions/48006515-4d68-4a94-84a2-69da5d351c6f/resourcegroups/rg-virtual-dc/providers/microsoft.operationalinsights/workspaces/vdc-workspace" # add the workspace id you want your logs sent to
 
 # copy from results of az-app-create.sh:
 aksname="simonsDemoAKS"
@@ -64,9 +65,11 @@ az aks create \
     --aad-client-app-id $clientApplicationId \
     --aad-tenant-id $tenantId \
     --enable-addons monitoring \
+    --workspace-resource-id $workspaceid \
     --network-policy azure \
     --client-secret $SERVICE_PRINCIPAL_SECRET \
-    --service-principal $SERVICE_PRINCIPAL_ID
+    --service-principal $SERVICE_PRINCIPAL_ID \
+    --vm-set-type VirtualMachineScaleSets 
     
 
 echo Do not forget to install flexvol to the cluster: kubectl create -f https://raw.githubusercontent.com/Azure/kubernetes-keyvault-flexvol/master/deployment/kv-flexvol-installer.yaml
